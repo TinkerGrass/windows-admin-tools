@@ -40,21 +40,21 @@ Invoke-Command -ComputerName $ComputerName -Credential $Creds -UseSSL -ScriptBlo
         Import-Module PSWindowsUpdate -Force
     }
 
-    ## Setup Ahikko task folder if it doesn't exist ##
+    ## Setup ORGNAME task folder if it doesn't exist ##
     $scheduleObject = New-Object -ComObject schedule.service
     $scheduleObject.connect()
     
     try{
-        $scheduleObject.GetFolder("\Ahikko")
+        $scheduleObject.GetFolder("\ORGNAME")
     }catch{
         $errormessage = $_.Exception.Message
         if($errormessage -like "The system cannot find the file specified. (0x80070002)"){
-            # Creating Ahikko task folder if it doesn't exist
-            Write-Host "Creating Ahikko task folder as it doesn't exist on $env:COMPUTERNAME . . .`n" -Foregroundcolor Yellow
+            # Creating ORGNAME task folder if it doesn't exist
+            Write-Host "Creating ORGNAME task folder as it doesn't exist on $env:COMPUTERNAME . . .`n" -Foregroundcolor Yellow
             $rootFolder = $scheduleObject.GetFolder("\")
-            $rootFolder.CreateFolder("Ahikko")
+            $rootFolder.CreateFolder("ORGNAME")
         }elseif($errormessage -like "Cannot create a file when that file already exists. (0x800700B7)"){
-            Write-Host "Ahikko task folder already exists on $env:COMPUTERNAME . . .`n" -Foregroundcolor Green
+            Write-Host "ORGNAME task folder already exists on $env:COMPUTERNAME . . .`n" -Foregroundcolor Green
         }
     }
     
@@ -73,27 +73,27 @@ Invoke-Command -ComputerName $ComputerName -Credential $Creds -UseSSL -ScriptBlo
         # Register Scheduled Task
         Write-Host "Registering PSWU Scheduled Task on $env:COMPUTERNAME . . .`n" -ForegroundColor Yellow
         Register-ScheduledTask -TaskName "PSWindowsUpdate" `
-                            -TaskPath "\Ahikko" `
+                            -TaskPath "\ORGNAME" `
                             -Action $PSWUSchTaskAction `
                             -Trigger $PSWUSchTaskTrigger `
                             -Principal $PSWUSchTaskPrincipal `
                             -Settings $PSWUSchTaskSetting
                             
-    }elseif($CheckPSWUTask.TaskPath -notlike "*Ahikko*"){
-        Write-Host "Removing Existing PSWU Task first if outside of Ahikko task folder on $env:COMPUTERNAME . . .`n" -ForegroundColor Yellow
+    }elseif($CheckPSWUTask.TaskPath -notlike "*ORGNAME*"){
+        Write-Host "Removing Existing PSWU Task first if outside of ORGNAME task folder on $env:COMPUTERNAME . . .`n" -ForegroundColor Yellow
         Unregister-ScheduledTask -TaskName "PSWindowsUpdate" -Confirm:$false
 
         Write-Host "Registering PSWU Scheduled Task on $env:COMPUTERNAME . . .`n" -ForegroundColor Yellow
         Register-ScheduledTask -TaskName "PSWindowsUpdate" `
-                            -TaskPath "\Ahikko" `
+                            -TaskPath "\ORGNAME" `
                             -Action $PSWUSchTaskAction `
                             -Trigger $PSWUSchTaskTrigger `
                             -Principal $PSWUSchTaskPrincipal `
                             -Settings $PSWUSchTaskSetting
-    }elseif($CheckPSWUTask.TaskPath -like "*Ahikko*"){
-        Write-Host "Looks like PSWU already exists inside Ahikko task folder on $env:COMPUTERNAME, will set task to PSWU Defaults. . .`n" -ForegroundColor Yellow
+    }elseif($CheckPSWUTask.TaskPath -like "*ORGNAME*"){
+        Write-Host "Looks like PSWU already exists inside ORGNAME task folder on $env:COMPUTERNAME, will set task to PSWU Defaults. . .`n" -ForegroundColor Yellow
         Set-ScheduledTask -TaskName "PSWindowsUpdate" `
-                          -TaskPath "\Ahikko" `
+                          -TaskPath "\ORGNAME" `
                           -Action $PSWUSchTaskAction `
                           -Trigger $PSWUSchTaskTrigger `
                           -Principal $PSWUSchTaskPrincipal `
@@ -102,7 +102,7 @@ Invoke-Command -ComputerName $ComputerName -Credential $Creds -UseSSL -ScriptBlo
 
     # Kick Start Scheduled Task
     Write-Host "Starting PSWindowsUpdate Scheduled Task . . .`n" -ForegroundColor Yellow
-    Start-ScheduledTask -TaskName "PSWindowsUpdate" -TaskPath "\Ahikko"
+    Start-ScheduledTask -TaskName "PSWindowsUpdate" -TaskPath "\ORGNAME"
 
     # Periodically check on the status of PSWindowsUpdate Scheduled Task
     $WUScheduledTaskRunStatus = (Get-ScheduledTask -TaskName "PSWindowsUpdate").State
