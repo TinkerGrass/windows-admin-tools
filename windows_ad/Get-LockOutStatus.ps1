@@ -17,7 +17,7 @@ try{
     $LockOutStatus = (Get-ADUser -Identity "$User" -Server "$DC" -Properties * | Select-Object LockedOut) | Out-String
         if($LockOutStatus -Match "True"){
             Write-Host "Unlocking $User on $DC. . ." -ForegroundColor Green
-            Unlock-ADAccount -Identity "$User" -Server $DC
+            Unlock-ADAccount -Identity "$User" -Server "$DC"
         }elseif($LockOutStatus -match "False"){
             Write-Host "$User is not locked in $DC!" -ForegroundColor Yellow
     }
@@ -28,7 +28,7 @@ try{
         foreach($DC in $dclist){
                 if($LockOutStatus -Match "True"){
                     Write-Host "Unlocking $User  on $DC. . ." -ForegroundColor Green
-                    Unlock-ADAccount -Identity "$User" -Server $DC
+                    Unlock-ADAccount -Identity "$User" -Server "$DC"
                 }elseif($LockOutStatus -match "False"){
                     Write-Host "$User is not locked in $DC!" -ForegroundColor Yellow
             }
